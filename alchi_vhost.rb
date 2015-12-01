@@ -14,8 +14,8 @@ open('/etc/hosts') do |f|
   end
   vhosts.each do |domain|
     unless File.file? "/etc/#{domain}"
-      File.symlink  "/etc/nginx/sites-available/#{domain}", "/etc/nginx/sites-enabled/#{domain}"
-      open("/etc/nginx/sites-available/#{domain}", 'w') do |g|
+      File.symlink  "/etc/#{domain}", "/opt/#{domain}"
+      open("/etc/#{domain}", 'w') do |g|
         g << "server { \n"
         g << "\tlisten 80 default_server;\n"
         g << "\tlisten [::]:80 default_server ipv6only=on;\n"
@@ -35,7 +35,8 @@ open('/etc/hosts') do |f|
         g << "\tpassenger_enabled on;\n"
         g << "}\n"
       end
+      %x(rails new /usr/share/nginx/html/"#{domain}")
     end
   end
-  p vhosts
 end
+%x(service nginx restart)
